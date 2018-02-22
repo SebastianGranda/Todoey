@@ -14,8 +14,18 @@ class TodoListViewController: UITableViewController {
     // 1.- Items displayed
     var itemArray = ["Find love", "Exercise", "Hey"]
     
+    // 6.- Store the data in the phone
+    
+    let defaults = UserDefaults.standard
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // 6. Store the data in the phone
+        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
+            itemArray = items
+        }
     }
     
     //MARK - TableView Datasource Methods
@@ -66,6 +76,9 @@ class TodoListViewController: UITableViewController {
             
             //Append the item written to the array
             self.itemArray.append(textField.text!)
+            
+            // 6.- Store the data in the phone
+            self.defaults.set(self.itemArray, forKey: "TodoListArray")
             
             //Show the new item in the table view
             self.tableView.reloadData()
