@@ -12,18 +12,30 @@ import UIKit
 class TodoListViewController: UITableViewController {
     
     // 1.- Items displayed
-    var itemArray = ["Find love", "Exercise", "Hey"]
+    var itemArray = [Item]()
     
     // 6.- Store the data in the phone
-    
     let defaults = UserDefaults.standard
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let newItem = Item()
+        newItem.title = "Find Mike"
+        itemArray.append(newItem)
+        
+        let newItem2 = Item()
+        newItem2.title = "Find Seb"
+        itemArray.append(newItem2)
+        
+        let newItem3 = Item()
+        newItem3.title = "Find Ang"
+        itemArray.append(newItem3)
+    
+        
         // 6. Store the data in the phone
-        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
+        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
             itemArray = items
         }
     }
@@ -37,8 +49,20 @@ class TodoListViewController: UITableViewController {
     
     // 3.- Display the text in the rows
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath) //Identifier: The name you gave to the navig. item in MS
-        cell.textLabel?.text = itemArray [indexPath.row]
+        
+        // Reuse the cell so when you scroll down and the first disappear, it will show up at the bottom
+        let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath) //Identifier: The name you gave to the navig. item in Canvas
+        
+        // 7. Build a Data Model: Associate properties (such as "Checked") with each item in the array (Swift file)
+        let item = itemArray[indexPath.row]
+        cell.textLabel?.text = item.title
+        
+        //4.2. UI: Set the checkmark when you select a cell and diselect it when you click again (+configure the MS) (Ternary Operator)
+        
+        cell.accessoryType = item.done == true ? .checkmark : .none
+        
+
+        
         return cell
     }
     
@@ -46,17 +70,17 @@ class TodoListViewController: UITableViewController {
     
     // 4.- Detect when the user click in a cell
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
         //print(itemArray[indexPath.row]) //print the string in the array
+        
+        //4.1. UI: Say that if its checked, its true (the opposite of what you set in Item.swift) -> 4.2.
+        itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+        
+        tableView.reloadData() // Refresh the page
         
         tableView.deselectRow(at: indexPath, animated: true) //UI: When you click, it doesn't keep gray
         
-         //UI: Set the checkmark when you select a cell and diselect it when you click again (+configure the MS)
-        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-        }
-        else {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-        }
+
     }
     
     //MARK: Add new items
@@ -74,8 +98,11 @@ class TodoListViewController: UITableViewController {
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             print("Success!")
             
+            let newItem = Item()
+            newItem.title = textField.text!
+            
             //Append the item written to the array
-            self.itemArray.append(textField.text!)
+            self.itemArray.append(newItem)
             
             // 6.- Store the data in the phone
             self.defaults.set(self.itemArray, forKey: "TodoListArray")
